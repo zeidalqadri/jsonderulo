@@ -1,0 +1,174 @@
+{
+  "name": "jsonderulo-vscode",
+  "displayName": "Jsonderulo - JSON Schema Generator",
+  "description": "Generate JSON schemas from natural language and create structured prompts for LLMs",
+  "version": "1.0.0",
+  "publisher": "jsonderulo",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other",
+    "Snippets",
+    "Language Packs"
+  ],
+  "keywords": [
+    "json",
+    "schema",
+    "llm",
+    "ai",
+    "prompt-engineering",
+    "openapi",
+    "typescript"
+  ],
+  "activationEvents": [
+    "onCommand:jsonderulo.generateSchema",
+    "onCommand:jsonderulo.createPrompt",
+    "onCommand:jsonderulo.validateJson",
+    "onCommand:jsonderulo.showCostAnalytics",
+    "onLanguage:json",
+    "onLanguage:jsonc"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "jsonderulo.generateSchema",
+        "title": "Generate JSON Schema from Description",
+        "category": "Jsonderulo"
+      },
+      {
+        "command": "jsonderulo.createPrompt",
+        "title": "Create LLM Prompt from Schema",
+        "category": "Jsonderulo"
+      },
+      {
+        "command": "jsonderulo.validateJson",
+        "title": "Validate JSON Against Schema",
+        "category": "Jsonderulo"
+      },
+      {
+        "command": "jsonderulo.repairJson",
+        "title": "Repair Invalid JSON",
+        "category": "Jsonderulo"
+      },
+      {
+        "command": "jsonderulo.showCostAnalytics",
+        "title": "Show Cost Analytics",
+        "category": "Jsonderulo"
+      },
+      {
+        "command": "jsonderulo.configureProviders",
+        "title": "Configure LLM Providers",
+        "category": "Jsonderulo"
+      },
+      {
+        "command": "jsonderulo.useTemplate",
+        "title": "Use Template",
+        "category": "Jsonderulo"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorLangId == json || editorLangId == jsonc",
+          "command": "jsonderulo.validateJson",
+          "group": "jsonderulo@1"
+        },
+        {
+          "when": "editorLangId == json || editorLangId == jsonc",
+          "command": "jsonderulo.repairJson", 
+          "group": "jsonderulo@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "jsonderulo.generateSchema",
+          "when": "true"
+        },
+        {
+          "command": "jsonderulo.createPrompt",
+          "when": "true"
+        },
+        {
+          "command": "jsonderulo.validateJson",
+          "when": "editorLangId == json || editorLangId == jsonc"
+        },
+        {
+          "command": "jsonderulo.repairJson",
+          "when": "editorLangId == json || editorLangId == jsonc"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Jsonderulo",
+      "properties": {
+        "jsonderulo.defaultProvider": {
+          "type": "string",
+          "default": "openai",
+          "enum": ["openai", "anthropic"],
+          "description": "Default LLM provider for prompt generation"
+        },
+        "jsonderulo.defaultModel": {
+          "type": "string", 
+          "default": "gpt-4o-mini",
+          "description": "Default model for the selected provider"
+        },
+        "jsonderulo.costOptimization": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic cost optimization"
+        },
+        "jsonderulo.showCostWarnings": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show warnings for expensive operations"
+        },
+        "jsonderulo.autoValidate": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically validate JSON files on save"
+        },
+        "jsonderulo.apiEndpoint": {
+          "type": "string",
+          "default": "https://api.jsonderulo.dev",
+          "description": "Jsonderulo API endpoint URL"
+        }
+      }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": "*.jsonderulo.json",
+        "url": "./schemas/jsonderulo-config.json"
+      }
+    ],
+    "languages": [
+      {
+        "id": "jsonderulo-template",
+        "aliases": ["Jsonderulo Template", "jsonderulo"],
+        "extensions": [".jsonderulo"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "jsonderulo-template",
+        "scopeName": "source.jsonderulo",
+        "path": "./syntaxes/jsonderulo.tmLanguage.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}

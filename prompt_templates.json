@@ -1,0 +1,90 @@
+{
+  "prompt_templates": {
+    "basic_json_system": {
+      "name": "Basic JSON System Prompt",
+      "template": "You are a JSON-only response assistant. Your outputs must be valid JSON that conforms to the provided schema. Do not include any text before or after the JSON object. Do not include markdown code blocks or formatting. Respond only with the JSON object.\n\nSchema: {schema}",
+      "variables": ["schema"],
+      "use_case": "General purpose JSON generation"
+    },
+    "structured_extraction": {
+      "name": "Information Extraction Prompt",
+      "template": "Extract the requested information from the following text and return it as a JSON object matching this schema:\n\n{schema}\n\nText to analyze:\n{text}\n\nRemember:\n- Extract only information present in the text\n- Use null for missing values\n- Ensure all enum values match exactly\n- Return only the JSON object",
+      "variables": ["schema", "text"],
+      "use_case": "Extracting structured data from unstructured text"
+    },
+    "few_shot_classification": {
+      "name": "Few-Shot Classification",
+      "template": "Classify the following text according to the schema. Here are some examples:\n\n{examples}\n\nNow classify this text:\n{text}\n\nReturn your response as a JSON object matching this schema:\n{schema}",
+      "variables": ["examples", "text", "schema"],
+      "use_case": "Classification tasks with examples"
+    },
+    "validation_focused": {
+      "name": "Validation-Focused Prompt",
+      "template": "Generate a JSON response for the following request. Your response MUST:\n1. Be valid JSON syntax\n2. Match the provided schema exactly\n3. Include all required fields\n4. Use only allowed enum values\n5. Respect all constraints (min/max, patterns, etc.)\n\nSchema:\n{schema}\n\nRequest:\n{request}\n\nIMPORTANT: Validate your response against the schema before returning it.",
+      "variables": ["schema", "request"],
+      "use_case": "When strict schema compliance is critical"
+    },
+    "hierarchical_generation": {
+      "name": "Hierarchical Generation",
+      "template": "Generate a hierarchical JSON structure step by step:\n\n1. First, create the top-level structure\n2. Then fill in each section with appropriate content\n3. Ensure all nested objects follow their schemas\n\nMain Schema:\n{main_schema}\n\nNested Schemas:\n{nested_schemas}\n\nRequirements:\n{requirements}\n\nGenerate the complete JSON object:",
+      "variables": ["main_schema", "nested_schemas", "requirements"],
+      "use_case": "Complex nested JSON structures"
+    },
+    "error_recovery": {
+      "name": "Error Recovery Prompt",
+      "template": "The previous JSON generation attempt failed validation with this error:\n{error}\n\nOriginal request:\n{request}\n\nSchema:\n{schema}\n\nPlease generate a corrected JSON response that:\n1. Fixes the validation error\n2. Maintains all valid parts of the original attempt\n3. Strictly follows the schema",
+      "variables": ["error", "request", "schema"],
+      "use_case": "Retry after validation failure"
+    },
+    "dynamic_schema": {
+      "name": "Dynamic Schema Prompt",
+      "template": "Generate a JSON response based on these dynamic requirements:\n\nBase structure: {base_schema}\n\nAdditional fields based on type '{type}':\n{type_specific_fields}\n\nConstraints:\n{constraints}\n\nGenerate a complete JSON object that includes both base and type-specific fields:",
+      "variables": ["base_schema", "type", "type_specific_fields", "constraints"],
+      "use_case": "Schemas that change based on conditions"
+    },
+    "code_to_json": {
+      "name": "Code Analysis to JSON",
+      "template": "Analyze the following code and generate a JSON report:\n\nCode:\n```{language}\n{code}\n```\n\nGenerate a JSON analysis report following this schema:\n{schema}\n\nFocus on:\n- Code quality metrics\n- Potential issues\n- Improvement suggestions\n- Complexity analysis",
+      "variables": ["language", "code", "schema"],
+      "use_case": "Converting code analysis to structured JSON"
+    },
+    "multi_stage_generation": {
+      "name": "Multi-Stage JSON Generation",
+      "template": "Generate a complex JSON document in stages:\n\nStage 1 - Outline:\nCreate the basic structure with placeholders\n\nStage 2 - Details:\nFill in each section with appropriate content\n\nStage 3 - Validation:\nEnsure all cross-references are valid and constraints are met\n\nFinal Schema:\n{schema}\n\nContext:\n{context}\n\nGenerate the complete JSON document:",
+      "variables": ["schema", "context"],
+      "use_case": "Very complex JSON documents"
+    },
+    "json_transformation": {
+      "name": "JSON Transformation",
+      "template": "Transform the input JSON according to the transformation rules:\n\nInput JSON:\n{input_json}\n\nTransformation Rules:\n{rules}\n\nOutput Schema:\n{output_schema}\n\nApply the transformations and return a JSON object matching the output schema:",
+      "variables": ["input_json", "rules", "output_schema"],
+      "use_case": "Converting between different JSON formats"
+    }
+  },
+  "system_prompts": {
+    "strict_json": "You are a JSON-only response system. Never include explanatory text, markdown formatting, or code blocks. Output only valid JSON.",
+    "validated_json": "You are a schema-validated JSON generator. Always validate your output against the provided schema before responding. If validation would fail, fix the issues before returning.",
+    "streaming_json": "You are a streaming JSON generator. Output JSON in a streaming-friendly format, either as JSON Lines or as a single valid JSON object that can be parsed incrementally.",
+    "explanatory_json": "You are a JSON generator that includes explanation fields. For every decision or classification, include an 'explanation' or 'reasoning' field to aid debugging and transparency."
+  },
+  "example_combinations": {
+    "sentiment_analysis": {
+      "system_prompt": "strict_json",
+      "prompt_template": "structured_extraction",
+      "schema_type": "basic_analysis",
+      "temperature": 0.3
+    },
+    "code_review": {
+      "system_prompt": "explanatory_json",
+      "prompt_template": "code_to_json",
+      "schema_type": "code_analysis",
+      "temperature": 0.5
+    },
+    "form_processing": {
+      "system_prompt": "validated_json",
+      "prompt_template": "dynamic_schema",
+      "schema_type": "conditional_form",
+      "temperature": 0.2
+    }
+  }
+}
