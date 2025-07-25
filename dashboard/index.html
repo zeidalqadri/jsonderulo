@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jsonderulo Cost Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-change {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .metric-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .metric-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .chart-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .suggestions-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .suggestion {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+
+        .suggestion:last-child {
+            margin-bottom: 0;
+        }
+
+        .suggestion-icon {
+            color: #856404;
+            margin-right: 0.5rem;
+        }
+
+        .provider-breakdown {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .provider-item {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .provider-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .provider-cost {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .usage-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .usage-table th,
+        .usage-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .usage-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .usage-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .controls select,
+        .controls button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .controls button {
+            background: #667eea;
+            color: white;
+            border: none;
+        }
+
+        .controls button:hover {
+            background: #5a6fd8;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .chart-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .provider-breakdown {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎵 Jsonderulo Analytics</h1>
+        <p>Cost optimization and usage insights for your JSON prompt engineering</p>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <label for="timeframe">Time Period:</label>
+            <select id="timeframe">
+                <option value="24">Last 24 hours</option>
+                <option value="168">Last 7 days</option>
+                <option value="720">Last 30 days</option>
+            </select>
+            <button onclick="refreshData()">Refresh Data</button>
+            <button onclick="exportReport()">Export Report</button>
+        </div>
+
+        <div id="error-container"></div>
+
+        <div id="loading" class="loading">
+            Loading analytics data...
+        </div>
+
+        <div id="dashboard-content" style="display: none;">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="total-cost">$0.00</div>
+                    <div class="metric-label">Total Cost</div>
+                    <div class="metric-change" id="cost-change">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="total-requests">0</div>
+                    <div class="metric-label">Total Requests</div>
+                    <div class="metric-change" id="requests-change">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="avg-cost">$0.00</div>
+                    <div class="metric-label">Avg Cost/Request</div>
+                    <div class="metric-change" id="avg-change">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="efficiency-score">--</div>
+                    <div class="metric-label">Efficiency Score</div>
+                    <div class="metric-change positive">Good</div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-container">
+                    <div class="chart-title">Cost Trend Over Time</div>
+                    <canvas id="costChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Cost by Provider</div>
+                    <canvas id="providerChart"></canvas>
+                </div>
+            </div>
+
+            <div class="suggestions-section">
+                <div class="chart-title">💡 Optimization Suggestions</div>
+                <div id="suggestions-container">
+                    <!-- Suggestions will be populated here -->
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">Recent Usage Activity</div>
+                <table class="usage-table" id="usage-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Operation</th>
+                            <th>Provider</th>
+                            <th>Model</th>
+                            <th>Tokens</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Usage data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://localhost:3000/api';
+        const API_KEY = localStorage.getItem('jsonderulo_api_key') || 'demo-key';
+
+        // Charts
+        let costChart, providerChart;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            loadData();
+        });
+
+        function initCharts() {
+            // Cost trend chart
+            const costCtx = document.getElementById('costChart').getContext('2d');
+            costChart = new Chart(costCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Daily Cost ($)',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(4);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Provider breakdown chart
+            const providerCtx = document.getElementById('providerChart').getContext('2d');
+            providerChart = new Chart(providerCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#667eea',
+                            '#764ba2',
+                            '#f093fb',
+                            '#f5576c',
+                            '#4facfe'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadData() {
+            showLoading(true);
+            clearError();
+
+            try {
+                const timeframe = document.getElementById('timeframe').value;
+                
+                // Load cost analytics
+                const costResponse = await fetch(`${API_BASE_URL}/analytics/costs?hours=${timeframe}`, {
+                    headers: {
+                        'Authorization': `ApiKey ${API_KEY}`
+                    }
+                });
+
+                if (!costResponse.ok) {
+                    throw new Error(`HTTP ${costResponse.status}: ${costResponse.statusText}`);
+                }
+
+                const costData = await costResponse.json();
+                
+                // Load usage analytics
+                const usageResponse = await fetch(`${API_BASE_URL}/analytics/usage`, {
+                    headers: {
+                        'Authorization': `ApiKey ${API_KEY}`
+                    }
+                });
+
+                const usageData = usageResponse.ok ? await usageResponse.json() : null;
+
+                // Update dashboard
+                updateMetrics(costData.summary);
+                updateCharts(costData);
+                updateSuggestions(costData.suggestions);
+                updateUsageTable(usageData);
+
+                showLoading(false);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError('Failed to load analytics data: ' + error.message);
+                showLoading(false);
+            }
+        }
+
+        function updateMetrics(summary) {
+            document.getElementById('total-cost').textContent = '$' + summary.totalCost.toFixed(4);
+            document.getElementById('total-requests').textContent = summary.totalRequests.toLocaleString();
+            document.getElementById('avg-cost').textContent = '$' + summary.averageCostPerRequest.toFixed(6);
+            
+            // Calculate efficiency score (simplified)
+            const efficiencyScore = Math.min(100, Math.max(0, 100 - (summary.averageCostPerRequest * 10000)));
+            document.getElementById('efficiency-score').textContent = Math.round(efficiencyScore) + '/100';
+        }
+
+        function updateCharts(data) {
+            // Update cost trend chart
+            if (data.trends && data.trends.costTrend) {
+                const labels = data.trends.costTrend.map(item => 
+                    new Date(item.date).toLocaleDateString()
+                );
+                const costs = data.trends.costTrend.map(item => item.cost);
+
+                costChart.data.labels = labels;
+                costChart.data.datasets[0].data = costs;
+                costChart.update();
+            }
+
+            // Update provider chart
+            if (data.breakdown && data.breakdown.byProvider) {
+                const providers = Object.keys(data.breakdown.byProvider);
+                const costs = Object.values(data.breakdown.byProvider);
+
+                providerChart.data.labels = providers;
+                providerChart.data.datasets[0].data = costs;
+                providerChart.update();
+            }
+        }
+
+        function updateSuggestions(suggestions) {
+            const container = document.getElementById('suggestions-container');
+            container.innerHTML = '';
+
+            if (!suggestions || suggestions.length === 0) {
+                container.innerHTML = '<div class="suggestion">No optimization suggestions at this time. Your usage looks efficient!</div>';
+                return;
+            }
+
+            suggestions.forEach(suggestion => {
+                const div = document.createElement('div');
+                div.className = 'suggestion';
+                div.innerHTML = `
+                    <span class="suggestion-icon">💡</span>
+                    ${suggestion}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateUsageTable(usageData) {
+            const tbody = document.querySelector('#usage-table tbody');
+            tbody.innerHTML = '';
+
+            if (!usageData || !usageData.topSchemas) {
+                tbody.innerHTML = '<tr><td colspan="6">No usage data available</td></tr>';
+                return;
+            }
+
+            // Show recent schemas as usage examples
+            usageData.topSchemas.slice(0, 10).forEach(schema => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(schema.created_at).toLocaleString()}</td>
+                    <td>Schema Generation</td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>Usage: ${schema.usage_count}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('dashboard-content').style.display = show ? 'none' : 'block';
+        }
+
+        function showError(message) {
+            const container = document.getElementById('error-container');
+            container.innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        function clearError() {
+            document.getElementById('error-container').innerHTML = '';
+        }
+
+        function refreshData() {
+            loadData();
+        }
+
+        function exportReport() {
+            // Simple CSV export
+            const data = {
+                timestamp: new Date().toISOString(),
+                totalCost: document.getElementById('total-cost').textContent,
+                totalRequests: document.getElementById('total-requests').textContent,
+                avgCost: document.getElementById('avg-cost').textContent,
+            };
+
+            const csv = Object.entries(data)
+                .map(([key, value]) => `${key},${value}`)
+                .join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `jsonderulo-report-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Handle API key setup
+        if (!localStorage.getItem('jsonderulo_api_key')) {
+            const apiKey = prompt('Enter your Jsonderulo API key:');
+            if (apiKey) {
+                localStorage.setItem('jsonderulo_api_key', apiKey);
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

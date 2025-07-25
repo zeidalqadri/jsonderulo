@@ -1,0 +1,374 @@
+{
+  "examples": {
+    "basic_analysis": {
+      "description": "Simple sentiment analysis with confidence score",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "sentiment": {
+            "type": "string",
+            "enum": ["positive", "negative", "neutral"],
+            "description": "The overall sentiment of the text"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Confidence score between 0 and 1"
+          },
+          "explanation": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Brief explanation of the sentiment assessment"
+          }
+        },
+        "required": ["sentiment", "confidence"],
+        "additionalProperties": false
+      }
+    },
+    "extraction_task": {
+      "description": "Extract structured information from unstructured text",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "entities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {"type": "string"},
+                "type": {
+                  "type": "string",
+                  "enum": ["person", "organization", "location", "date", "product"]
+                },
+                "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+              },
+              "required": ["text", "type"],
+              "additionalProperties": false
+            }
+          },
+          "relationships": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "subject": {"type": "string"},
+                "predicate": {"type": "string"},
+                "object": {"type": "string"},
+                "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+              },
+              "required": ["subject", "predicate", "object"],
+              "additionalProperties": false
+            }
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "required": ["entities", "summary"],
+        "additionalProperties": false
+      }
+    },
+    "classification_multi_label": {
+      "description": "Multi-label classification with hierarchical categories",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "primary_category": {
+            "type": "string",
+            "enum": ["technology", "business", "health", "science", "entertainment", "sports", "politics"]
+          },
+          "subcategories": {
+            "type": "array",
+            "items": {"type": "string"},
+            "minItems": 1,
+            "maxItems": 5
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+$"
+            },
+            "uniqueItems": true,
+            "maxItems": 10
+          },
+          "confidence_scores": {
+            "type": "object",
+            "patternProperties": {
+              "^.*$": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        },
+        "required": ["primary_category", "subcategories"],
+        "additionalProperties": false
+      }
+    },
+    "qa_extraction": {
+      "description": "Question-answer pair extraction from documents",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "document_id": {"type": "string"},
+          "qa_pairs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 200
+                },
+                "answer": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 500
+                },
+                "context": {
+                  "type": "string",
+                  "description": "The relevant context from the document"
+                },
+                "difficulty": {
+                  "type": "string",
+                  "enum": ["easy", "medium", "hard"]
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["factual", "inference", "opinion", "procedural"]
+                }
+              },
+              "required": ["question", "answer", "type"],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 20
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "total_questions": {"type": "integer", "minimum": 0},
+              "extraction_timestamp": {"type": "string", "format": "date-time"},
+              "source_length": {"type": "integer", "minimum": 0}
+            },
+            "required": ["total_questions"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["qa_pairs", "metadata"],
+        "additionalProperties": false
+      }
+    },
+    "code_analysis": {
+      "description": "Code analysis and improvement suggestions",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "enum": ["python", "javascript", "typescript", "java", "go", "rust", "c++", "ruby"]
+          },
+          "analysis": {
+            "type": "object",
+            "properties": {
+              "complexity_score": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "maintainability_score": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "test_coverage_estimate": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "required": ["complexity_score", "maintainability_score"],
+            "additionalProperties": false
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["bug", "security", "performance", "style", "complexity", "duplication"]
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": ["critical", "high", "medium", "low", "info"]
+                },
+                "line_number": {"type": "integer", "minimum": 1},
+                "description": {"type": "string"},
+                "suggestion": {"type": "string"}
+              },
+              "required": ["type", "severity", "description"],
+              "additionalProperties": false
+            }
+          },
+          "improvements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "enum": ["refactoring", "optimization", "security", "testing", "documentation"]
+                },
+                "description": {"type": "string"},
+                "code_snippet": {"type": "string"},
+                "impact": {
+                  "type": "string",
+                  "enum": ["high", "medium", "low"]
+                }
+              },
+              "required": ["category", "description", "impact"],
+              "additionalProperties": false
+            },
+            "maxItems": 10
+          }
+        },
+        "required": ["language", "analysis", "issues"],
+        "additionalProperties": false
+      }
+    },
+    "conditional_form": {
+      "description": "Dynamic form with conditional fields",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "user_type": {
+            "type": "string",
+            "enum": ["individual", "business", "nonprofit"]
+          },
+          "basic_info": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string", "minLength": 2},
+              "email": {"type": "string", "format": "email"},
+              "phone": {"type": "string", "pattern": "^\\+?[1-9]\\d{1,14}$"}
+            },
+            "required": ["name", "email"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["user_type", "basic_info"],
+        "allOf": [
+          {
+            "if": {
+              "properties": {"user_type": {"const": "business"}}
+            },
+            "then": {
+              "properties": {
+                "business_info": {
+                  "type": "object",
+                  "properties": {
+                    "company_name": {"type": "string"},
+                    "tax_id": {"type": "string"},
+                    "industry": {
+                      "type": "string",
+                      "enum": ["technology", "finance", "healthcare", "retail", "manufacturing", "other"]
+                    },
+                    "employee_count": {
+                      "type": "string",
+                      "enum": ["1-10", "11-50", "51-200", "201-500", "500+"]
+                    }
+                  },
+                  "required": ["company_name", "industry"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["business_info"]
+            }
+          },
+          {
+            "if": {
+              "properties": {"user_type": {"const": "nonprofit"}}
+            },
+            "then": {
+              "properties": {
+                "nonprofit_info": {
+                  "type": "object",
+                  "properties": {
+                    "organization_name": {"type": "string"},
+                    "ein": {"type": "string", "pattern": "^\\d{2}-\\d{7}$"},
+                    "mission": {"type": "string", "maxLength": 500},
+                    "focus_areas": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": ["education", "health", "environment", "social_services", "arts", "other"]
+                      },
+                      "minItems": 1,
+                      "maxItems": 3
+                    }
+                  },
+                  "required": ["organization_name", "mission", "focus_areas"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["nonprofit_info"]
+            }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "recursive_tree": {
+      "description": "Recursive tree structure for hierarchical data",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "node": {
+            "type": "object",
+            "properties": {
+              "id": {"type": "string", "pattern": "^[a-zA-Z0-9-_]+$"},
+              "name": {"type": "string"},
+              "type": {
+                "type": "string",
+                "enum": ["folder", "file", "link"]
+              },
+              "metadata": {
+                "type": "object",
+                "properties": {
+                  "created": {"type": "string", "format": "date-time"},
+                  "modified": {"type": "string", "format": "date-time"},
+                  "size": {"type": "integer", "minimum": 0},
+                  "permissions": {
+                    "type": "string",
+                    "pattern": "^[rwx-]{9}$"
+                  }
+                },
+                "additionalProperties": true
+              },
+              "children": {
+                "type": "array",
+                "items": {"$ref": "#/definitions/node"}
+              }
+            },
+            "required": ["id", "name", "type"],
+            "additionalProperties": false
+          }
+        },
+        "type": "object",
+        "properties": {
+          "root": {"$ref": "#/definitions/node"},
+          "total_nodes": {"type": "integer", "minimum": 1},
+          "max_depth": {"type": "integer", "minimum": 1}
+        },
+        "required": ["root"],
+        "additionalProperties": false
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "jsonderulo": {
+      "command": "node",
+      "args": ["/path/to/jsonderulo/dist/mcp/index.js"],
+      "env": {}
+    }
+  }
+}
