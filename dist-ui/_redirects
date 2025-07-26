@@ -1,0 +1,15 @@
+# Handle SPA routing - specific routes first
+/builder    /index.html   200
+/monitoring /index.html   200
+/schemas    /index.html   200
+/testing    /index.html   200
+/analytics  /index.html   200
+
+# Handle static assets
+/assets/*   /assets/:splat  200
+
+# API proxy to backend (when deployed)
+/api/*      https://your-backend-domain.com/api/:splat  200
+
+# Catch-all for SPA routing (must be last)
+/*          /index.html   200
