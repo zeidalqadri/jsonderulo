@@ -11,12 +11,20 @@
   },
   "scripts": {
     "build": "tsc && chmod +x dist/mcp/index.js",
+    "build:ui": "vite build",
+    "build:all": "npm run build && npm run build:ui",
     "dev": "tsc --watch",
+    "dev:ui": "vite",
+    "preview:ui": "vite preview",
     "start": "node dist/cli.js",
     "test": "jest",
+    "test:ui": "cd ui && npx tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit",
+    "typecheck:ui": "cd ui && npx tsc --noEmit",
+    "deploy:cf": "./deploy.sh",
+    "deploy:preview": "npm run build:ui && npx vite preview",
     "mcp:inspect": "npx @modelcontextprotocol/inspector dist/mcp/index.js"
   },
   "keywords": [
@@ -31,21 +39,33 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "ajv": "^8.12.0",
+    "axios": "^1.11.0",
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
     "json-schema-to-typescript": "^13.1.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.7.1",
+    "reactflow": "^11.11.4",
+    "recharts": "^3.1.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/jest": "^29.5.11",
     "@types/node": "^20.10.5",
+    "@types/react-router-dom": "^5.3.3",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "eslint": "^8.56.0",
     "jest": "^29.7.0",
     "prettier": "^3.1.1",
+    "terser": "^5.43.1",
     "ts-jest": "^29.1.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vite": "^7.0.6"
   }
 }

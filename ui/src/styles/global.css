@@ -1,0 +1,318 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'JetBrains Mono', 'Monaco', 'Consolas', monospace;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+h1 {
+  font-size: 2rem;
+  border-bottom: 2px solid #000;
+  padding-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.25rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+/* Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid-cols-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.grid-cols-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.grid-cols-4 {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+/* Flexbox utilities */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+/* Spacing */
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.m-4 {
+  margin: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+/* Cards and panels */
+.card {
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 0;
+  padding: 1.5rem;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+.card:hover {
+  box-shadow: 6px 6px 0px #000000;
+  transform: translate(-2px, -2px);
+  transition: all 0.1s ease;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #333333;
+  padding: 1rem;
+}
+
+/* Buttons */
+.btn {
+  background: #ffffff;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.btn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+}
+
+.btn-primary {
+  background: #000000;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: #333333;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px dashed #666666;
+}
+
+.btn-outline:hover {
+  border-style: solid;
+  background: #f8f8f8;
+}
+
+/* Forms */
+.input {
+  border: 2px solid #000000;
+  padding: 0.5rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  background: #ffffff;
+  color: #000000;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #000000;
+  box-shadow: 0 0 0 2px #cccccc;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Status indicators */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.status-active {
+  background: #000000;
+}
+
+.status-inactive {
+  background: #cccccc;
+}
+
+.status-error {
+  background: #666666;
+  border: 1px solid #000000;
+}
+
+/* Charts and data visualization */
+.chart-container {
+  background: #ffffff;
+  border: 1px solid #000000;
+  padding: 1rem;
+}
+
+/* Flow diagrams */
+.react-flow__node {
+  border: 2px solid #000000;
+  background: #ffffff;
+  font-family: inherit;
+  color: #000000;
+}
+
+.react-flow__node.selected {
+  box-shadow: 0 0 0 3px #666666;
+}
+
+.react-flow__edge-path {
+  stroke: #000000;
+  stroke-width: 2;
+  stroke-dasharray: 5,5;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #000000;
+  stroke-width: 3;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ffffff;
+  border: 1px solid #cccccc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #000000;
+  border: 1px solid #000000;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #333333;
+}
+
+/* Loading states */
+.loading {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #cccccc;
+  border-radius: 50%;
+  border-top-color: #000000;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error states */
+.error {
+  color: #000000;
+  background: #f8f8f8;
+  border: 1px dashed #666666;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Utilities */
+.text-center {
+  text-align: center;
+}
+
+.text-small {
+  font-size: 0.75rem;
+}
+
+.text-bold {
+  font-weight: 600;
+}
+
+.border-dashed {
+  border-style: dashed;
+}
+
+.hidden {
+  display: none;
+}
+
+.block {
+  display: block;
+}
+
+.inline-block {
+  display: inline-block;
+}
