@@ -2,6 +2,7 @@ import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import IdeaExecutor from './features/idea-executor/IdeaExecutor'
+import PromptOptimizer from './features/prompt-optimizer/PromptOptimizer'
 import PipelineBuilder from './features/pipeline-builder/PipelineBuilder'
 import Monitoring from './features/monitoring/Monitoring'
 import SchemaDesigner from './features/schema-designer/SchemaDesigner'
@@ -12,7 +13,8 @@ const App: React.FC = () => {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<IdeaExecutor />} />
+        <Route path="/" element={<PromptOptimizer />} />
+        <Route path="/optimizer" element={<PromptOptimizer />} />
         <Route path="/execute" element={<IdeaExecutor />} />
         <Route path="/builder" element={<PipelineBuilder />} />
         <Route path="/monitoring" element={<Monitoring />} />
