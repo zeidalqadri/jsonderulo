@@ -297,6 +297,125 @@ export async function onRequest(context) {
       });
     }
 
+    if (path === 'optimize-prompt' && request.method === 'POST') {
+      const body = await request.json();
+      const { idea, outputFormat = 'natural' } = body;
+      
+      if (!idea) {
+        return jsonResponse({ error: 'Idea is required' }, 400);
+      }
+
+      console.log('Optimizing prompt for idea:', idea);
+
+      const startTime = Date.now();
+
+      // Simulate prompt optimization using jsonderulo pipeline
+      let category = 'problem-solving';
+      let complexity = 'moderate';
+      let confidence = 0.85;
+
+      // Simple categorization
+      if (idea.includes('data') || idea.includes('analysis')) {
+        category = 'data-analysis';
+        complexity = 'complex';
+      } else if (idea.includes('customer') || idea.includes('user')) {
+        category = 'market-research';
+        complexity = 'moderate';
+      } else if (idea.includes('product') || idea.includes('feature')) {
+        category = 'product-development';
+        complexity = 'moderate';
+      }
+
+      // Generate enhanced prompt based on format
+      let enhancedPrompt;
+      let suggestions = [];
+
+      if (outputFormat === 'json') {
+        enhancedPrompt = `{
+  "task": "${idea}",
+  "instructions": [
+    "Analyze the provided input thoroughly",
+    "Extract key insights and patterns",
+    "Structure the response in the specified format",
+    "Ensure all required fields are included"
+  ],
+  "output_format": {
+    "type": "object",
+    "properties": {
+      "analysis": {"type": "string", "description": "Main analysis or insights"},
+      "key_findings": {"type": "array", "items": {"type": "string"}},
+      "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+      "recommendations": {"type": "array", "items": {"type": "string"}}
+    },
+    "required": ["analysis", "key_findings", "confidence_score"]
+  },
+  "constraints": [
+    "Be specific and actionable",
+    "Include supporting evidence",
+    "Maintain objectivity",
+    "Focus on practical insights"
+  ]
+}`;
+
+        suggestions = [
+          'Consider adding validation rules for data types',
+          'Include enum constraints for categorical data',
+          'Add pattern matching for structured text fields',
+          'Define minimum/maximum values for numerical outputs'
+        ];
+      } else {
+        enhancedPrompt = `You are an expert analyst tasked with: ${idea}
+
+Please follow these structured guidelines:
+
+**Analysis Framework:**
+1. Begin with a comprehensive overview of the subject matter
+2. Break down the analysis into key components
+3. Identify patterns, trends, and significant findings
+4. Provide evidence-based insights
+
+**Output Structure:**
+- **Summary**: Concise overview of your findings
+- **Key Insights**: 3-5 most important discoveries
+- **Supporting Evidence**: Data points or examples that validate your insights
+- **Recommendations**: Actionable next steps or suggestions
+- **Confidence Assessment**: Your level of certainty in the analysis (0-100%)
+
+**Quality Standards:**
+- Be specific and avoid generalities
+- Use clear, professional language
+- Support claims with reasoning
+- Focus on actionable outcomes
+- Maintain objectivity throughout
+
+Please ensure your response is comprehensive yet concise, prioritizing clarity and practical value.`;
+
+        suggestions = [
+          'Add specific examples or use cases to make the prompt more concrete',
+          'Include quality criteria for evaluating the output',
+          'Consider adding domain-specific terminology or context',
+          'Specify the target audience or intended use of the analysis'
+        ];
+      }
+
+      const processingTime = Date.now() - startTime;
+
+      const result = {
+        original: idea,
+        enhanced: enhancedPrompt,
+        metadata: {
+          category,
+          complexity,
+          tokens_used: Math.floor(enhancedPrompt.length / 4), // Rough token estimation
+          processing_time: processingTime,
+          confidence
+        },
+        suggestions
+      };
+
+      return jsonResponse(result);
+    }
+
     if (path === 'analytics' && request.method === 'GET') {
       const analytics = {
         total_executions: storage.executions.length,
