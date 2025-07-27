@@ -24,10 +24,11 @@ class ApiService {
 
     this.api.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem('auth_token')
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`
-        }
+        // Auth temporarily disabled for demo
+        // const token = localStorage.getItem('auth_token')
+        // if (token) {
+        //   config.headers.Authorization = `Bearer ${token}`
+        // }
         return config
       },
       (error) => Promise.reject(error)
@@ -36,10 +37,11 @@ class ApiService {
     this.api.interceptors.response.use(
       (response) => response,
       (error) => {
-        if (error.response?.status === 401) {
-          localStorage.removeItem('auth_token')
-          window.location.href = '/login'
-        }
+        // Auth temporarily disabled for demo  
+        // if (error.response?.status === 401) {
+        //   localStorage.removeItem('auth_token')
+        //   window.location.href = '/login'
+        // }
         return Promise.reject(error)
       }
     )
@@ -134,8 +136,9 @@ class ApiService {
 
   // Template methods
   async getTemplates(limit = 50, offset = 0): Promise<{ templates: Template[]; total: number }> {
-    const response = await this.api.get('/templates', { params: { limit, offset } })
-    return response.data
+    const response = await this.api.get('/templates')
+    const templates = response.data
+    return { templates, total: templates.length }
   }
 
   async getTemplate(id: string): Promise<Template> {
@@ -168,6 +171,37 @@ class ApiService {
     const response = await this.api.post('/analytics/costs', metric)
     return response.data
   }
+
+  // Jsonderulo pipeline execution
+  async executeIdea(idea: string, template?: string, options?: any): Promise<any> {
+    const response = await this.api.post('/pipeline/execute', { 
+      idea, 
+      template, 
+      options 
+    })
+    return response.data
+  }
+
+  async generateSchema(description: string): Promise<any> {
+    const response = await this.api.post('/schema/generate', { description })
+    return response.data
+  }
+
+  async validateJson(data: any, schema: any): Promise<any> {
+    const response = await this.api.post('/validate', { data, schema })
+    return response.data
+  }
+
+  async getAnalytics(): Promise<any> {
+    const response = await this.api.get('/analytics')
+    return response.data
+  }
+
+  async getExecutions(page = 1, limit = 10): Promise<any> {
+    const response = await this.api.get('/executions', { params: { page, limit } })
+    return response.data
+  }
+
 
   // Utility method for testing connection
   async healthCheck(): Promise<{ status: string }> {

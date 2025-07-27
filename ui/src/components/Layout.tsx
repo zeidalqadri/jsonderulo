@@ -9,6 +9,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation()
 
   const navItems = [
+    { path: '/', label: 'Idea Executor', icon: '🎵' },
     { path: '/builder', label: 'Pipeline Builder', icon: '⚡' },
     { path: '/monitoring', label: 'Monitoring', icon: '📊' },
     { path: '/schemas', label: 'Schema Designer', icon: '🔧' },
