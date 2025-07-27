@@ -1,82 +1,266 @@
 // Cloudflare Pages Function to handle API routes
-// This replaces the Node.js Express server for Cloudflare deployment
+// This implements a functional prompt optimizer without complex dependencies
 
-// Mock implementations of the core jsonderulo classes for Cloudflare
-class MockJsonderulo {
-  speak(request, schemaDescription, options = {}) {
+// Enhanced prompt optimization logic
+class PromptOptimizer {
+  analyzePrompt(idea) {
+    const words = idea.toLowerCase().split(/\s+/);
+    const categories = {
+      'data-analysis': ['data', 'analysis', 'analyze', 'metrics', 'statistics', 'insights', 'trends', 'patterns'],
+      'creative': ['create', 'design', 'imagine', 'innovative', 'creative', 'artistic', 'unique'],
+      'technical': ['code', 'program', 'develop', 'build', 'implement', 'algorithm', 'system', 'api'],
+      'research': ['research', 'study', 'investigate', 'explore', 'examine', 'discover', 'find'],
+      'problem-solving': ['solve', 'fix', 'debug', 'troubleshoot', 'resolve', 'issue', 'problem'],
+      'planning': ['plan', 'strategy', 'organize', 'schedule', 'roadmap', 'timeline', 'project'],
+      'communication': ['write', 'explain', 'describe', 'communicate', 'present', 'summarize', 'document']
+    };
+
+    let detectedCategory = 'general';
+    let maxScore = 0;
+
+    for (const [category, keywords] of Object.entries(categories)) {
+      const score = words.filter(word => keywords.includes(word)).length;
+      if (score > maxScore) {
+        maxScore = score;
+        detectedCategory = category;
+      }
+    }
+
+    const complexity = idea.length > 100 ? 'complex' : idea.length > 50 ? 'moderate' : 'simple';
+    const hasSpecificRequirements = /must|should|need|require|ensure/i.test(idea);
+    
     return {
-      prompt: `You are a JSON-only response system. Never include explanatory text, markdown formatting, or code blocks. Output only valid JSON.
-
-Task: ${request}
-
-JSON Schema:
-{
-  "type": "object",
-  "properties": {},
-  "required": [],
-  "additionalProperties": true
-}
-
-Requirements:
-1. Your response MUST be valid JSON
-2. Your response MUST conform to the provided schema
-3. Include all required fields
-4. Use only allowed enum values
-5. Respect all constraints (min/max, patterns, etc.)
-
-Note: Generate response with creative variation (temperature: ${options.temperature || 0.7})`,
-      schema: schemaDescription ? JSON.parse(schemaDescription) : {
-        type: 'object',
-        properties: {},
-        required: [],
-        additionalProperties: true
-      },
-      systemPrompt: "You are a JSON-only response system. Never include explanatory text, markdown formatting, or code blocks. Output only valid JSON."
+      category: detectedCategory,
+      complexity,
+      hasSpecificRequirements,
+      wordCount: words.length,
+      keyTerms: words.filter(w => w.length > 4)
     };
   }
-}
 
-class MockSchemaGenerator {
-  async generateFromDescription(description) {
-    // Simple schema generation based on keywords
-    if (description.includes('user') || description.includes('profile')) {
-      return {
-        type: 'object',
-        properties: {
-          name: { type: 'string' },
-          email: { type: 'string', pattern: '^[\\w.-]+@[\\w.-]+\\.\\w+$' },
-          age: { type: 'number', minimum: 0, maximum: 150 }
-        },
-        required: ['name', 'email'],
-        additionalProperties: false
-      };
-    }
+  generateCoTPrompt(idea, analysis) {
+    const { category, complexity, hasSpecificRequirements, keyTerms } = analysis;
     
-    if (description.includes('sentiment') || description.includes('feedback')) {
-      return {
-        type: 'object',
-        properties: {
-          sentiment: { type: 'string', enum: ['positive', 'negative', 'neutral'] },
-          confidence: { type: 'number', minimum: 0, maximum: 1 },
-          text: { type: 'string' }
-        },
-        required: ['sentiment'],
-        additionalProperties: false
-      };
-    }
+    let prompt = `Task: ${idea}\n\n`;
     
-    return {
+    // Add category-specific instructions
+    const categoryInstructions = {
+      'data-analysis': 'Approach this systematically by first understanding the data structure, then identifying patterns, and finally drawing actionable insights.',
+      'creative': 'Think outside conventional boundaries while maintaining practicality. Consider multiple creative approaches before settling on the most innovative solution.',
+      'technical': 'Break down the technical requirements into components. Consider scalability, maintainability, and best practices in your implementation.',
+      'research': 'Start with a comprehensive overview, then dive deep into specific areas. Cite sources and validate findings with evidence.',
+      'problem-solving': 'First, clearly identify the root cause. Then, generate multiple solutions and evaluate their pros and cons before recommending the best approach.',
+      'planning': 'Create a structured timeline with clear milestones. Consider dependencies, resources, and potential risks in your planning.',
+      'communication': 'Structure your response for clarity and impact. Use appropriate tone and formatting for your target audience.'
+    };
+
+    prompt += `Approach: ${categoryInstructions[category] || 'Analyze the requirements carefully and provide a comprehensive response.'}\n\n`;
+
+    // Add Chain of Thought structure
+    prompt += 'Please follow this step-by-step reasoning process:\n\n';
+    
+    if (complexity === 'complex') {
+      prompt += '1. **Problem Decomposition**: Break down the complex task into manageable components\n';
+      prompt += '2. **Analysis**: Examine each component in detail\n';
+      prompt += '3. **Synthesis**: Combine insights to form a comprehensive solution\n';
+      prompt += '4. **Validation**: Verify the solution addresses all requirements\n';
+      prompt += '5. **Optimization**: Refine for efficiency and effectiveness\n\n';
+    } else {
+      prompt += '1. **Understanding**: Clarify what is being asked\n';
+      prompt += '2. **Planning**: Outline your approach\n';
+      prompt += '3. **Execution**: Implement your solution\n';
+      prompt += '4. **Review**: Ensure quality and completeness\n\n';
+    }
+
+    // Add specific requirements handling
+    if (hasSpecificRequirements) {
+      prompt += 'Critical Requirements:\n';
+      prompt += '- Pay special attention to any "must", "should", or "need" statements\n';
+      prompt += '- Ensure all specified constraints are met\n';
+      prompt += '- Validate your output against the stated requirements\n\n';
+    }
+
+    // Add focus on key terms
+    if (keyTerms.length > 0) {
+      prompt += `Key Focus Areas: ${keyTerms.slice(0, 5).join(', ')}\n\n`;
+    }
+
+    return prompt;
+  }
+
+  generateToTPrompt(idea, analysis) {
+    const { category, complexity } = analysis;
+    
+    let prompt = `Task: ${idea}\n\n`;
+    prompt += 'Use Tree of Thoughts approach - explore multiple solution paths:\n\n';
+    
+    // Generate branches based on category
+    const branchTemplates = {
+      'data-analysis': ['Statistical Approach', 'Machine Learning Approach', 'Visualization-First Approach'],
+      'creative': ['Conventional Approach', 'Innovative Approach', 'Hybrid Approach'],
+      'technical': ['Simple Implementation', 'Optimized Solution', 'Scalable Architecture'],
+      'research': ['Literature Review', 'Empirical Analysis', 'Mixed Methods'],
+      'problem-solving': ['Quick Fix', 'Root Cause Solution', 'Preventive Approach'],
+      'planning': ['Agile Methodology', 'Waterfall Approach', 'Hybrid Planning'],
+      'communication': ['Formal Presentation', 'Casual Explanation', 'Visual Storytelling']
+    };
+
+    const branches = branchTemplates[category] || ['Approach A', 'Approach B', 'Approach C'];
+    
+    branches.forEach((branch, index) => {
+      prompt += `\n**Branch ${index + 1}: ${branch}**\n`;
+      prompt += `- Explore this approach fully\n`;
+      prompt += `- Consider advantages and limitations\n`;
+      prompt += `- Evaluate feasibility and impact\n`;
+    });
+
+    prompt += '\n**Synthesis**:\n';
+    prompt += 'After exploring all branches, synthesize the best elements from each approach into an optimal solution.\n';
+
+    return prompt;
+  }
+
+  generateJsonPrompt(idea, analysis) {
+    const { category, keyTerms } = analysis;
+    
+    // Generate a dynamic schema based on the task
+    const schemaProperties = {
+      result: { type: 'object', description: 'Main result object' }
+    };
+
+    // Add category-specific fields
+    const categoryFields = {
+      'data-analysis': {
+        insights: { type: 'array', items: { type: 'string' } },
+        metrics: { type: 'object' },
+        trends: { type: 'array', items: { type: 'object' } }
+      },
+      'creative': {
+        concepts: { type: 'array', items: { type: 'string' } },
+        implementation: { type: 'object' },
+        uniqueFeatures: { type: 'array', items: { type: 'string' } }
+      },
+      'technical': {
+        components: { type: 'array', items: { type: 'object' } },
+        architecture: { type: 'object' },
+        dependencies: { type: 'array', items: { type: 'string' } }
+      },
+      'research': {
+        findings: { type: 'array', items: { type: 'object' } },
+        methodology: { type: 'string' },
+        sources: { type: 'array', items: { type: 'string' } }
+      }
+    };
+
+    const fields = categoryFields[category] || {
+      data: { type: 'object' },
+      summary: { type: 'string' },
+      details: { type: 'array', items: { type: 'string' } }
+    };
+
+    const schema = {
       type: 'object',
       properties: {
-        data: { type: 'string' }
+        ...fields,
+        metadata: {
+          type: 'object',
+          properties: {
+            confidence: { type: 'number', minimum: 0, maximum: 1 },
+            category: { type: 'string' },
+            timestamp: { type: 'string', format: 'date-time' }
+          }
+        }
       },
-      required: [],
-      additionalProperties: true
+      required: Object.keys(fields)
     };
+
+    const prompt = `Generate a JSON response for: ${idea}
+
+Output must be valid JSON matching this schema:
+${JSON.stringify(schema, null, 2)}
+
+Requirements:
+1. All fields must be populated with relevant data
+2. Ensure proper JSON formatting (quotes, commas, brackets)
+3. Use meaningful values, not placeholders
+4. Include rich, detailed information in each field
+5. Maintain consistency across related fields`;
+
+    return { prompt, schema };
+  }
+
+  generateSuggestions(idea, analysis, outputFormat) {
+    const baseSuggestions = [
+      'Consider adding specific examples to make the prompt more concrete',
+      'Include quality criteria to evaluate the output',
+      'Add constraints to guide the response format'
+    ];
+
+    const categorySuggestions = {
+      'data-analysis': [
+        'Specify the type of analysis needed (descriptive, predictive, prescriptive)',
+        'Define key metrics or KPIs to focus on',
+        'Include data quality requirements'
+      ],
+      'creative': [
+        'Add inspiration sources or style references',
+        'Define the target audience for the creative work',
+        'Include constraints that foster creativity'
+      ],
+      'technical': [
+        'Specify programming language or technology stack',
+        'Include performance requirements',
+        'Add error handling considerations'
+      ],
+      'research': [
+        'Define the scope and boundaries of research',
+        'Specify citation requirements',
+        'Include methodology preferences'
+      ]
+    };
+
+    const suggestions = [...baseSuggestions];
+    
+    if (categorySuggestions[analysis.category]) {
+      suggestions.push(...categorySuggestions[analysis.category]);
+    }
+
+    if (outputFormat === 'json') {
+      suggestions.push(
+        'Define specific data types for each JSON field',
+        'Add validation rules for structured data',
+        'Include example values in schema documentation'
+      );
+    }
+
+    // Return unique suggestions
+    return [...new Set(suggestions)].slice(0, 5);
   }
 }
 
-class MockJsonValidator {
+// Simple jsonderulo implementation for backward compatibility
+const jsonderulo = {
+  speak: (request, schemaDescription, options = {}) => {
+    return {
+      prompt: `Task: ${request}\n\nRequirements:\n1. Provide a comprehensive response\n2. Be specific and detailed\n3. Focus on practical outcomes`,
+      schema: schemaDescription ? JSON.parse(schemaDescription) : null,
+      systemPrompt: "You are a helpful assistant."
+    };
+  }
+};
+
+// Schema generator
+const schemaGenerator = {
+  async generateFromDescription(description) {
+    const optimizer = new PromptOptimizer();
+    const analysis = optimizer.analyzePrompt(description);
+    const { schema } = optimizer.generateJsonPrompt(description, analysis);
+    return schema;
+  }
+};
+
+// Validator
+const validator = {
   async validate(data, schema) {
     return {
       valid: true,
@@ -84,12 +268,7 @@ class MockJsonValidator {
       repaired: null
     };
   }
-}
-
-// Initialize mock components
-const jsonderulo = new MockJsonderulo();
-const schemaGenerator = new MockSchemaGenerator();
-const validator = new MockJsonValidator();
+};
 
 // In-memory storage for demo
 const storage = {
@@ -299,121 +478,80 @@ export async function onRequest(context) {
 
     if (path === 'optimize-prompt' && request.method === 'POST') {
       const body = await request.json();
-      const { idea, outputFormat = 'natural' } = body;
+      const { idea, outputFormat = 'natural', strategy = 'cot', options = {} } = body;
       
       if (!idea) {
         return jsonResponse({ error: 'Idea is required' }, 400);
       }
 
-      console.log('Optimizing prompt for idea:', idea);
+      console.log('Optimizing prompt for idea:', idea, 'with strategy:', strategy);
 
       const startTime = Date.now();
+      const optimizer = new PromptOptimizer();
+      
+      try {
+        // Analyze the prompt
+        const analysis = optimizer.analyzePrompt(idea);
+        
+        let enhancedPrompt;
+        let metadata = {
+          category: analysis.category,
+          complexity: analysis.complexity,
+          strategy: strategy,
+          wordCount: analysis.wordCount
+        };
+        
+        // Generate enhanced prompt based on strategy and format
+        if (outputFormat === 'json') {
+          const { prompt, schema } = optimizer.generateJsonPrompt(idea, analysis);
+          enhancedPrompt = prompt;
+          metadata.schema = schema;
+          metadata.outputFormat = 'json';
+        } else {
+          // Natural language output
+          switch (strategy) {
+            case 'tot':
+              enhancedPrompt = optimizer.generateToTPrompt(idea, analysis);
+              break;
+            case 'cot':
+            default:
+              enhancedPrompt = optimizer.generateCoTPrompt(idea, analysis);
+              break;
+          }
+          metadata.outputFormat = 'natural';
+        }
+        
+        // Generate suggestions
+        const suggestions = optimizer.generateSuggestions(idea, analysis, outputFormat);
+        
+        // Calculate metrics
+        const processingTime = Date.now() - startTime;
+        metadata.processingTime = processingTime;
+        metadata.tokensUsed = Math.floor(enhancedPrompt.length / 4);
+        metadata.confidence = 0.75 + (analysis.hasSpecificRequirements ? 0.1 : 0) + (analysis.keyTerms.length > 3 ? 0.1 : 0);
+        
+        const result = {
+          original: idea,
+          enhanced: enhancedPrompt,
+          metadata,
+          suggestions,
+          analysis: {
+            detectedCategory: analysis.category,
+            complexity: analysis.complexity,
+            keyTerms: analysis.keyTerms.slice(0, 10),
+            hasSpecificRequirements: analysis.hasSpecificRequirements
+          }
+        };
 
-      // Simulate prompt optimization using jsonderulo pipeline
-      let category = 'problem-solving';
-      let complexity = 'moderate';
-      let confidence = 0.85;
-
-      // Simple categorization
-      if (idea.includes('data') || idea.includes('analysis')) {
-        category = 'data-analysis';
-        complexity = 'complex';
-      } else if (idea.includes('customer') || idea.includes('user')) {
-        category = 'market-research';
-        complexity = 'moderate';
-      } else if (idea.includes('product') || idea.includes('feature')) {
-        category = 'product-development';
-        complexity = 'moderate';
+        return jsonResponse(result);
+        
+      } catch (error) {
+        console.error('Error optimizing prompt:', error);
+        return jsonResponse({ 
+          error: 'Failed to optimize prompt', 
+          details: error.message 
+        }, 500);
       }
-
-      // Generate enhanced prompt based on format
-      let enhancedPrompt;
-      let suggestions = [];
-
-      if (outputFormat === 'json') {
-        enhancedPrompt = `{
-  "task": "${idea}",
-  "instructions": [
-    "Analyze the provided input thoroughly",
-    "Extract key insights and patterns",
-    "Structure the response in the specified format",
-    "Ensure all required fields are included"
-  ],
-  "output_format": {
-    "type": "object",
-    "properties": {
-      "analysis": {"type": "string", "description": "Main analysis or insights"},
-      "key_findings": {"type": "array", "items": {"type": "string"}},
-      "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
-      "recommendations": {"type": "array", "items": {"type": "string"}}
-    },
-    "required": ["analysis", "key_findings", "confidence_score"]
-  },
-  "constraints": [
-    "Be specific and actionable",
-    "Include supporting evidence",
-    "Maintain objectivity",
-    "Focus on practical insights"
-  ]
-}`;
-
-        suggestions = [
-          'Consider adding validation rules for data types',
-          'Include enum constraints for categorical data',
-          'Add pattern matching for structured text fields',
-          'Define minimum/maximum values for numerical outputs'
-        ];
-      } else {
-        enhancedPrompt = `You are an expert analyst tasked with: ${idea}
-
-Please follow these structured guidelines:
-
-**Analysis Framework:**
-1. Begin with a comprehensive overview of the subject matter
-2. Break down the analysis into key components
-3. Identify patterns, trends, and significant findings
-4. Provide evidence-based insights
-
-**Output Structure:**
-- **Summary**: Concise overview of your findings
-- **Key Insights**: 3-5 most important discoveries
-- **Supporting Evidence**: Data points or examples that validate your insights
-- **Recommendations**: Actionable next steps or suggestions
-- **Confidence Assessment**: Your level of certainty in the analysis (0-100%)
-
-**Quality Standards:**
-- Be specific and avoid generalities
-- Use clear, professional language
-- Support claims with reasoning
-- Focus on actionable outcomes
-- Maintain objectivity throughout
-
-Please ensure your response is comprehensive yet concise, prioritizing clarity and practical value.`;
-
-        suggestions = [
-          'Add specific examples or use cases to make the prompt more concrete',
-          'Include quality criteria for evaluating the output',
-          'Consider adding domain-specific terminology or context',
-          'Specify the target audience or intended use of the analysis'
-        ];
-      }
-
-      const processingTime = Date.now() - startTime;
-
-      const result = {
-        original: idea,
-        enhanced: enhancedPrompt,
-        metadata: {
-          category,
-          complexity,
-          tokens_used: Math.floor(enhancedPrompt.length / 4), // Rough token estimation
-          processing_time: processingTime,
-          confidence
-        },
-        suggestions
-      };
-
-      return jsonResponse(result);
     }
 
     if (path === 'analytics' && request.method === 'GET') {
