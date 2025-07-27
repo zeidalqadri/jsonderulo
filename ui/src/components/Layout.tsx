@@ -16,6 +16,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: '/schemas', label: 'Schema Designer', icon: '🔧' },
     { path: '/testing', label: 'Testing', icon: '🧪' },
     { path: '/analytics', label: 'Analytics', icon: '📈' },
+    { path: '/v2-demo', label: 'V2 Demo', icon: '🚀' },
   ]
 
   return (

@@ -7,7 +7,8 @@
   "types": "dist/index.d.ts",
   "bin": {
     "jsonderulo": "./dist/cli.js",
-    "jsonderulo-mcp": "./dist/mcp/index.js"
+    "jsonderulo-mcp": "./dist/mcp/index.js",
+    "jsonderulo-v2": "./dist/cli-v2.js"
   },
   "scripts": {
     "build": "tsc && chmod +x dist/mcp/index.js",
@@ -28,7 +29,9 @@
     "typecheck:ui": "cd ui && npx tsc --noEmit",
     "deploy:cf": "./deploy.sh",
     "deploy:preview": "npm run build:ui && npx vite preview",
-    "mcp:inspect": "npx @modelcontextprotocol/inspector dist/mcp/index.js"
+    "mcp:inspect": "npx @modelcontextprotocol/inspector dist/mcp/index.js",
+    "examples": "node --loader tsx examples/direct-usage.ts",
+    "jsonderulo:v2": "node --loader tsx src/core/enhancedJsonderuloV2.ts"
   },
   "keywords": [
     "json",
@@ -56,7 +59,7 @@
     "react-router-dom": "^7.7.1",
     "reactflow": "^11.11.4",
     "recharts": "^3.1.0",
-    "zod": "^3.22.4"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/jest": "^29.5.11",
