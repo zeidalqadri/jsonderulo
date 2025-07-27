@@ -1,23 +1,9 @@
-name = "jsonderulo-pipeline-ui"
+name = "jsonderulo-pipeline"
 compatibility_date = "2024-01-15"
+pages_build_output_dir = "dist-ui"
 
 [env.production]
-name = "jsonderulo-pipeline-ui"
+name = "jsonderulo-pipeline"
 
 [env.production.vars]
 NODE_ENV = "production"
-
-# Cloudflare Pages configuration
-[[env.production.services]]
-service = "jsonderulo-api"
-environment = "production"
-
-# Build configuration
-[build]
-command = "npm run build:ui"
-cwd = "."
-watch_dir = "ui/src"
-
-[build.upload]
-format = "directory"
-dir = "dist-ui"
