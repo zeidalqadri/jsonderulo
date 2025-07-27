@@ -8,6 +8,7 @@ import Monitoring from './features/monitoring/Monitoring'
 import SchemaDesigner from './features/schema-designer/SchemaDesigner'
 import Testing from './features/testing/Testing'
 import Analytics from './features/analytics/Analytics'
+import V2Demo from './pages/V2Demo'
 
 const App: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ const App: React.FC = () => {
         <Route path="/schemas" element={<SchemaDesigner />} />
         <Route path="/testing" element={<Testing />} />
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/v2-demo" element={<V2Demo />} />
         {/* Catch-all route - redirect unknown paths to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
