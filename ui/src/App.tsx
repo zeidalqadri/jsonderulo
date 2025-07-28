@@ -1,8 +1,7 @@
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
-import IdeaExecutor from './features/idea-executor/IdeaExecutor'
-import PromptOptimizer from './features/prompt-optimizer/PromptOptimizer'
+import PromptStudio from './features/prompt-studio/PromptStudio'
 import PipelineBuilder from './features/pipeline-builder/PipelineBuilder'
 import Monitoring from './features/monitoring/Monitoring'
 import SchemaDesigner from './features/schema-designer/SchemaDesigner'
@@ -14,15 +13,24 @@ const App: React.FC = () => {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<PromptOptimizer />} />
-        <Route path="/optimizer" element={<PromptOptimizer />} />
-        <Route path="/execute" element={<IdeaExecutor />} />
+        {/* Unified Prompt Engineering Studio */}
+        <Route path="/" element={<PromptStudio />} />
+        <Route path="/studio" element={<PromptStudio />} />
+        
+        {/* Legacy redirects to unified studio */}
+        <Route path="/optimizer" element={<Navigate to="/studio" replace />} />
+        <Route path="/execute" element={<Navigate to="/studio" replace />} />
+        
+        {/* Pipeline and Infrastructure */}
         <Route path="/builder" element={<PipelineBuilder />} />
         <Route path="/monitoring" element={<Monitoring />} />
         <Route path="/schemas" element={<SchemaDesigner />} />
         <Route path="/testing" element={<Testing />} />
         <Route path="/analytics" element={<Analytics />} />
+        
+        {/* Advanced Features */}
         <Route path="/v2-demo" element={<V2Demo />} />
+        
         {/* Catch-all route - redirect unknown paths to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
