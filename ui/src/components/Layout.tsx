@@ -9,13 +9,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation()
 
   const navItems = [
-    { path: '/', label: 'Prompt Optimizer', icon: '✨' },
-    { path: '/execute', label: 'Idea Executor', icon: '🎵' },
-    { path: '/builder', label: 'Pipeline Builder', icon: '⚡' },
-    { path: '/monitoring', label: 'Monitoring', icon: '📊' },
-    { path: '/schemas', label: 'Schema Designer', icon: '🔧' },
-    { path: '/testing', label: 'Testing', icon: '🧪' },
-    { path: '/analytics', label: 'Analytics', icon: '📈' },
+    { path: '/', label: 'Prompt Studio', icon: '🎨', description: 'Unified prompt engineering workspace' },
+    { path: '/builder', label: 'Pipeline Builder', icon: '⚡', description: 'Build prompt processing pipelines' },
+    { path: '/monitoring', label: 'Monitoring', icon: '📊', description: 'Monitor prompt performance' },
+    { path: '/schemas', label: 'Schema Designer', icon: '🔧', description: 'Design JSON schemas' },
+    { path: '/testing', label: 'Testing', icon: '🧪', description: 'Test prompt variations' },
+    { path: '/analytics', label: 'Analytics', icon: '📈', description: 'View usage analytics' },
+    { path: '/v2-demo', label: 'Advanced Features', icon: '🚀', description: 'Explore V2 capabilities' },
   ]
 
   return (
@@ -32,7 +32,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             jsonderulo
           </h1>
           <p style={{ fontSize: '0.75rem', color: '#666', marginTop: '0.5rem' }}>
-            Pipeline Studio
+            Prompt Engineering Platform
           </p>
         </div>
 
@@ -69,7 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           paddingTop: '1rem'
         }}>
           <div>Status: <span style={{ color: '#000' }}>●</span> Online</div>
-          <div>Version: 1.0.0</div>
+          <div>Version: 3.0.0-unified</div>
         </div>
       </aside>
 

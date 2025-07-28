@@ -10,12 +10,25 @@ LLMs are trained on millions of JSON files from APIs and code - it's their nativ
 
 ## Features
 
+### Core Features
 - 🎯 **Natural Language → JSON Schema**: Automatically generate schemas from descriptions
 - 🔄 **Smart Prompt Transformation**: Convert regular prompts into JSON-structured prompts
 - 📋 **Template Library**: Pre-built patterns for common use cases
 - ✅ **Validation & Repair**: Ensure outputs match schemas with automatic fixes
 - 🚀 **Multiple Modes**: Strict, explanatory, streaming, and validated outputs
 - 🛠️ **CLI & API**: Use as a library or command-line tool
+
+### 🆕 Enhanced V2 Features
+- 🧠 **Advanced Context Management**: Semantic memory with intelligent retrieval
+- 🤔 **Chain of Thought (CoT)**: Step-by-step reasoning for complex tasks
+- 🌳 **Tree of Thoughts (ToT)**: Explore multiple solution paths
+- 🔄 **Self-Consistency**: Generate consensus from multiple outputs
+- 📡 **JSON Streaming**: Progressive validation during generation
+- 📊 **A/B Testing**: Optimize prompts with data-driven insights
+- 📈 **Quality Tracking**: Monitor and improve prompt effectiveness
+- 🎭 **Role-Based Prompting**: Specialized personas for different tasks
+- 🗜️ **Context Compression**: Fit more context in limited windows
+- 🔍 **Semantic Search**: Find relevant context using embeddings
 
 ## Installation
 
@@ -165,6 +178,194 @@ if (result.success) {
 } else {
   console.log('Failed after', result.attempts, 'attempts');
 }
+```
+
+## 🚀 Enhanced Jsonderulo V2 - Advanced Features
+
+jsonderulo V2 introduces cutting-edge prompt and context engineering capabilities that maximize output quality for both natural language and JSON generation.
+
+### Advanced Context Management
+
+Build context-aware prompts with semantic memory and retrieval:
+
+```javascript
+import { EnhancedJsonderuloV2 } from 'jsonderulo';
+
+const jsonderulo = new EnhancedJsonderuloV2();
+
+// Add context with semantic indexing
+jsonderulo.addContext('User prefers detailed explanations', 'user_input');
+jsonderulo.addContext('Previous API used REST patterns', 'assistant_output');
+jsonderulo.addContext('Company uses microservices', 'reference');
+
+// Generate context-aware prompt
+const result = await jsonderulo.speakEnhanced(
+  'Design a new API endpoint',
+  undefined,
+  {
+    enableContext: true,
+    semanticSearch: true,
+    contextWindowSize: 4000
+  }
+);
+
+// Find similar context
+const similar = await jsonderulo.findSimilarContext('API design patterns', 5);
+```
+
+### Chain of Thought (CoT) Prompting
+
+Guide LLMs through step-by-step reasoning:
+
+```javascript
+const result = await jsonderulo.speakEnhanced(
+  'Analyze this complex system architecture',
+  schema,
+  {
+    strategy: 'cot',
+    enableCoT: true
+  }
+);
+
+// Result includes reasoning steps
+console.log(result.reasoning.steps);
+// Output: Step-by-step thought process
+```
+
+### Tree of Thoughts (ToT) for Complex Problems
+
+Explore multiple solution paths:
+
+```javascript
+const result = await jsonderulo.speakEnhanced(
+  'Find the optimal database design for this use case',
+  undefined,
+  {
+    strategy: 'tot',
+    enableToT: true
+  }
+);
+```
+
+### Self-Consistency for Reliability
+
+Generate multiple outputs and find consensus:
+
+```javascript
+const result = await jsonderulo.processWithConsistency(
+  'Extract key information from this document',
+  llmFunction,
+  {
+    selfConsistency: true,
+    consistencyRounds: 3,
+    qualityThreshold: 0.8
+  }
+);
+
+console.log(result.consistency.confidenceScore);
+console.log(result.consistency.consensusOutput);
+```
+
+### JSON Streaming with Progressive Validation
+
+Stream and validate JSON in real-time:
+
+```javascript
+const schema = z.object({
+  items: z.array(z.object({
+    id: z.string(),
+    data: z.any()
+  }))
+});
+
+for await (const result of jsonderulo.streamJSON(
+  'Generate large dataset',
+  streamingLLMFunction,
+  schema
+)) {
+  console.log(`Progress: ${result.tokens} tokens, Valid: ${result.errors.length === 0}`);
+}
+```
+
+### A/B Testing for Prompt Optimization
+
+Test and optimize prompt variations:
+
+```javascript
+const testId = await jsonderulo.runABTest(
+  'Base prompt',
+  [
+    { name: 'baseline', modifier: x => x },
+    { name: 'with-cot', modifier: x => x, strategy: 'cot' },
+    { name: 'with-examples', modifier: x => `${x} with examples` }
+  ],
+  llmFunction,
+  {
+    sampleSize: 20,
+    metrics: ['outputAccuracy', 'schemaCompliance', 'tokensUsed']
+  }
+);
+
+// Check results
+const results = jsonderulo.getTestResults(testId);
+```
+
+### Prompt Quality Tracking
+
+Monitor and improve prompt effectiveness:
+
+```javascript
+const result = await jsonderulo.speakEnhanced(
+  'Generate report',
+  schema,
+  { trackQuality: true }
+);
+
+console.log(result.quality.score.overall); // 0.85
+console.log(result.quality.recommendations);
+// ["Add more specific constraints", "Include examples"]
+
+// Get system-wide metrics
+const metrics = jsonderulo.getQualityMetrics();
+```
+
+### Combined Strategies
+
+Mix multiple techniques for maximum effectiveness:
+
+```javascript
+const result = await jsonderulo.speakEnhanced(
+  'Complex analytical task',
+  schema,
+  {
+    strategy: ['cot', 'role-based'],
+    enableContext: true,
+    trackQuality: true,
+    semanticSearch: true
+  }
+);
+```
+
+### Configuration Options
+
+```javascript
+const jsonderulo = new EnhancedJsonderuloV2();
+
+// Update context settings
+jsonderulo.updateContextConfig({
+  maxTokens: 8000,
+  compressionEnabled: true
+});
+
+// Adjust quality weights
+jsonderulo.updateQualityWeights({
+  effectiveness: 0.5,
+  efficiency: 0.2,
+  quality: 0.3
+});
+
+// Set embeddings provider
+jsonderulo.setEmbeddingsProvider('openai'); // or 'local', 'mock'
 ```
 
 ## Advanced Usage
