@@ -1,3 +1,5 @@
 export { default as Button } from './Button'
 export { Card, CardHeader, CardContent, CardTitle } from './Card'
 export { default as Input } from './Input'
+export { Badge } from './badge'
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'
